@@ -1,0 +1,14 @@
+# local-api-ingressroute.yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: local-api-ingressroute
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`localhost`) && PathPrefix(`/api`)
+    kind: Rule
+    services:
+    - name: api-service
+      port: 5000

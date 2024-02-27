@@ -1,0 +1,47 @@
+#backend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schoodle-api 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: schoodle-api
+  template:
+    metadata:
+      labels:
+        app: schoodle-api
+    spec:
+      containers:
+        - image: esiee79798987/schoodle-api:1
+          imagePullPolicy: IfNotPresent
+          name: schoodle-api
+          ports: 
+            - containerPort: 5000
+      restartPolicy: Always
+
+---
+
+#frontend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schoodle-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: schoodle-ui
+  template:
+    metadata:
+      labels:
+        app: schoodle-ui
+    spec:
+      containers:
+        - image: esiee79798987/schoodle-ui:1
+          imagePullPolicy: IfNotPresent
+          name: schoodle-ui
+          ports: 
+            - containerPort: 3000
+      restartPolicy: Always
