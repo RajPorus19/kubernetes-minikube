@@ -1,0 +1,83 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schoodle-api
+  namespace: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: schoodle-api
+  template:
+    metadata:
+      labels:
+        app: schoodle-api
+    spec:
+      containers:
+      - name: schoodle-api
+        image: esiee79798987/schoodle-api:1
+        ports:
+        - containerPort: 5000
+
+---
+
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: schoodle-api
+  namespace: backend
+spec:
+  selector:
+    app: schoodle-api
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+  type: NodePort
+
+---
+
+# Traefik Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: schoodle-api-ingress
+  namespace: backend
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: default-middleware
+    traefik.ingress.kubernetes.io/router.entrypoints: http
+    traefik.ingress.kubernetes.io/router.entrypoints: https
+spec:
+  rules:
+  - host: schoodle-api.example.local
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: schoodle-api
+            port:
+              number: 5000
+
+---
+
+# Istio VirtualService (optional, only if you still want to use Istio for other purposes)
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: schoodle-api-virtual-service
+  namespace: backend
+spec:
+  hosts:
+  - "schoodle-api.example.local"
+  gateways:
+  - default/traefik-http
+  http:
+  - route:
+    - destination:
+        host: schoodle-api
+        port:
+          number: 5000
