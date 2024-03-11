@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: schoodle-api
-        image: esiee79798987/schoodle-api:1
+        image: esiee79798987/schoodle-api:latest
         ports:
         - containerPort: 5000

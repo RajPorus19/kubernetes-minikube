@@ -1,16 +1,33 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
 metadata:
-  name: my-ingress
+  name: schoodle-gateway
 spec:
-  rules:
-  - host: "localhost.local"
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: schoodle-api
-            port:
-              number: 5000
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 8080
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: schoodle-virtual-service
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - schoodle-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: schoodle-api.default.svc.cluster.local
+        port:
+          number: 5000
